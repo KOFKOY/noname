@@ -1,4 +1,4 @@
-'use strict';
+import { game } from '../noname.js';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'xiake',
@@ -34,12 +34,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				position:'e',
 				filter:function(event,player){
-					return player.countCards('e')>0;
+					return player.hasCard(card=>lib.skill.rouquan.filterCard(card,player),lib.skill.rouquan.position);
 				},
-				filterCard:true,
+				filterCard:lib.filter.cardRecastable,
 				prompt:'将要重铸的牌置入弃牌堆并摸一张牌',
 				discard:false,
-				delay:0.5,
+				lose:false,
+				delay:false,
 				check:function(card,player){
 					var val=get.equipValue(card);
 					var player=_status.event.player;
@@ -51,16 +52,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 0;
 				},
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-				},
 				content:function(){
-					"step 0"
-					player.draw();
-					"step 1"
-					for(var i=0;i<cards.length;i++){
-						cards[i].discard();
-					}
+					player.recast(cards);
 				},
 				ai:{
 					order:9.5,
@@ -73,7 +66,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				frequent:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return _status.currentPhase==player&&event.card&&event.card.name=='sha';
 				},
 				content:function(){
@@ -113,13 +106,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xk_shenxiangyun:'沈湘芸',
 			xk_fujianhan:'傅剑寒',
 			zhongzhan:'重斩',
-			zhongzhan_info:'每当你即将造成伤害，你可流失一点体力令伤害+1',
+			zhongzhan_info:'每当你即将造成伤害，你可失去1点体力令伤害+1。',
 			gzhenji:'震击',
-			gzhenji_info:'你使用杀造成伤害后，可以摸一张牌，并且本回合内可以额外使用一张杀',
+			gzhenji_info:'你使用杀造成伤害后，可以摸一张牌，并且本回合内可以额外使用一张杀。',
 			rouquan:'柔拳',
-			rouquan_info:'你可以重铸装备区内的牌；当你没有武器牌时，你的杀可以指定任意个目标',
+			rouquan_info:'你可以重铸装备区内的牌；当你没有武器牌时，你的杀可以指定任意个目标。',
 			zitong:'通悟',
-			zitong_info:'当你于自己的回合内使用第三张牌时，你可以将一张传送门置于你的手牌',
+			zitong_info:'当你于自己的回合内使用第三张牌时，你可以将一张传送门置于你的手牌。',
 		},
 	};
 });

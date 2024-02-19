@@ -5,7 +5,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		card:{
 			pozhenjue:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:true,
 				notarget:true,
 				content:function(){
@@ -25,7 +25,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			changshezhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(card,player){
 					if(player.inline()) return true;
 					if(player.identity=='unknown'||player.identity=='ye') return false;
@@ -68,7 +68,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			tianfuzhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(){
 					return game.hasPlayer(function(current){
 						return current.isMajor();
@@ -94,7 +94,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			dizaizhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(){
 					return game.hasPlayer(function(current){
 						return current.isNotMajor();
@@ -121,7 +121,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			fengyangzhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:true,
 				filterTarget:function(card,player,target){
 					return target.sieged();
@@ -142,7 +142,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			yunchuizhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:true,
 				filterTarget:function(card,player,target){
 					return target.siege();
@@ -163,7 +163,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			qixingzhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(card,player){
 					return player.siege()||player.sieged();
 				},
@@ -202,7 +202,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			shepanzhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(card,player){
 					if(player.identity=='unknown'||player.identity=='ye') return false;
 					if(get.population(player.identity)<=1) return false;
@@ -231,7 +231,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			longfeizhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(card,player){
 					return player.next.siege(player);
 				},
@@ -261,7 +261,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			huyizhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(card,player){
 					return player.siege(player.next)||player.siege(player.previous);
 				},
@@ -309,7 +309,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			niaoxiangzhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:true,
 				filterTarget:function(card,player,target){
 					if(player.identity==target.identity) return false;
@@ -348,7 +348,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
-
 		},
 		translate:{
 			zhenfa:'阵法',
@@ -365,17 +364,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			longfeizhen:'龙飞阵',
 			huyizhen:'虎翼阵',
 			niaoxiangzhen:'鸟翔阵',
-			niaoxiangzhen_info:'令所有非你阵营的队列的角色今次打出一张闪，或者受到一点伤害',
-			qixingzhen_info:'弃置所有围攻你的角色各一张牌，然后视为对所有你围攻的角色使用一张不计入出杀次数的杀',
-			// longfeizhen_info:'弃置围攻你的角色各一张牌，然后摸一张牌',
-			// qixingzhen_info:'令我方所有角色进入围攻状态',
-			// shepanzhen_info:'令我方所有角色进入队列状态',
-			// yunchuizhen_info:'令所有围攻角色获得技能【无双】，直到其首次造成伤害',
-			// fengyangzhen_info:'令所有被围攻角色获得技能【飞影】，直到其首次受到伤害',
-			dizaizhen_info:'所有小势力角色摸一张牌',
-			changshezhen_info:'若你处于队列中，与你同一队列的所有角色摸一张牌，否则将与你逆时针距离最近的同势力角色移至你下家',
-			// pozhenjue_info:'将所有角色的顺序随机重排',
-			tianfuzhen_info:'所有大势力角色弃置一张牌'
+			niaoxiangzhen_info:'令所有非你阵营的队列的角色今次打出一张闪，或者受到1点伤害。',
+			qixingzhen_info:'弃置所有围攻你的角色各一张牌，然后视为对所有你围攻的角色使用一张不计入出杀次数的杀。',
+			// longfeizhen_info:'弃置围攻你的角色各一张牌，然后摸一张牌。',
+			// qixingzhen_info:'令我方所有角色进入围攻状态。',
+			// shepanzhen_info:'令我方所有角色进入队列状态。',
+			// yunchuizhen_info:'令所有围攻角色获得技能〖无双〗，直到其首次造成伤害。',
+			// fengyangzhen_info:'令所有被围攻角色获得技能〖飞影〗，直到其首次受到伤害。',
+			dizaizhen_info:'所有小势力角色摸一张牌。',
+			changshezhen_info:'若你处于队列中，与你同一队列的所有角色摸一张牌，否则将与你逆时针距离最近的同势力角色移至你下家。',
+			// pozhenjue_info:'将所有角色的顺序随机重排。',
+			tianfuzhen_info:'所有大势力角色弃置一张牌。'
 		},
 		list:[
 			["diamond",1,'changshezhen'],
