@@ -9,7 +9,7 @@ game.import('character', function (lib, game, ui, get, ai, _status) {
             }
         },
         character:{
-            dy_jiuyou:['male','qun',5,['sk_tangping']],
+            dy_jiuyou:['male','qun',5,['sk_tangping','sk_fanzhi','sk_jiqu']],
         },
         characterIntro:{
             dy_jiuyou:"生活在地狱的人间，暗无天日，不见希望",
@@ -51,6 +51,43 @@ game.import('character', function (lib, game, ui, get, ai, _status) {
                     expose:0.2
                 }
             },
+            sk_fanzhi:{
+                //反制  判定区，红牌做杀，黑牌做闪 使用或打出。
+
+            },
+            sk_jiqu:{
+                //汲取  锁定技，判定区数量变化你摸一张牌
+                audio:2,
+				trigger:{
+					player:'loseAfter',
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+				},
+				frequent:true,
+				filter(event,player){
+                    console.log("判定区牌数量:" + player.countCards('j'));
+					if(player.countCards('j')) return false;
+					const evt=event.getl(player);
+					return evt&&evt.player==player&&evt.hs&&evt.hs.length>0;
+				},
+				async content(event,trigger,player){
+					player.draw();
+				},
+				ai:{
+					threaten:0.8,
+					effect:{
+						target(card){
+							if(card.name=='guohe'||card.name=='liuxinghuoyu') return 0.5;
+						}
+					},
+					noh:true,
+					skillTagFilter(player,tag){
+						if(tag=='noh'){
+							if(player.countCards('h')!=1) return false;
+						}
+					}
+				}
+                
+            }
         },
         characterReplace:{},
         translate:{
