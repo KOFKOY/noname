@@ -1,11 +1,11 @@
 'use strict';
 game.import('character', function (lib, game, ui, get, ai, _status) {
     return{
-        name: "diyu",
+        name: "wsj",
         connect:true,
         characterSort:{
-            diyu:{
-                renjian:['dy_jiuyou'],
+            wsj:{
+                wsj:['dy_jiuyou'],
             }
         },
         character:{
@@ -67,9 +67,11 @@ game.import('character', function (lib, game, ui, get, ai, _status) {
                     console.log("判定区牌数量:" + player.countCards('j'));
 					if(player.countCards('j')) return false;
 					const evt=event.getl(player);
+                    console.log("过滤返回:" + evt&&evt.player==player&&evt.hs&&evt.hs.length>0);
 					return evt&&evt.player==player&&evt.hs&&evt.hs.length>0;
 				},
 				async content(event,trigger,player){
+                    console.log('触发汲取摸牌')
 					player.draw();
 				},
 				ai:{
@@ -91,6 +93,7 @@ game.import('character', function (lib, game, ui, get, ai, _status) {
         },
         characterReplace:{},
         translate:{
+            wsj:"人世间",
             dy_jiuyou: "九幽",
             sk_tangping: "躺平",
             sk_tangping_info:'摸牌阶段摸牌时，你可以少摸任意张牌，然后获得等量的角色的各一张手牌。',
