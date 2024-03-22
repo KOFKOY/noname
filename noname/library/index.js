@@ -9783,6 +9783,8 @@ export class Library extends Uninstantable {
 				if (Array.isArray(info.trigger[role])) return info.trigger[role].includes(triggername);
 				return info.trigger[role] == triggername;
 			})) return false;
+			console.log('wsj:在这里触发filter');
+			console.log('触发类型：' + triggername);
 			if (info.filter && !info.filter(event, player, triggername)) return false;
 			if (event._notrigger.includes(player) && !lib.skill.global.includes(skill)) return false;
 			if (typeof info.usable == 'number' && player.hasSkill('counttrigger') &&

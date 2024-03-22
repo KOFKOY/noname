@@ -12,7 +12,7 @@ game.import('character', function (lib, game, ui, get, ai, _status) {
             dy_jiuyou:['male','qun',5,['sk_tangping','sk_fanzhi','sk_jiqu']],
         },
         characterIntro:{
-            dy_jiuyou:"生活在地狱的人间，暗无天日，不见希望",
+            dy_jiuyou:"身处黑暗，心向光明",
         },
         perfectPair:{},
         skill:{
@@ -59,18 +59,23 @@ game.import('character', function (lib, game, ui, get, ai, _status) {
                 //汲取  锁定技，判定区数量变化你摸一张牌
                 audio:2,
 				trigger:{
-					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+					player:'addJudgeAfter',
+					global:['addJudgeAfter'],
 				},
 				frequent:true,
-				filter(event,player){
+				filter(event,player,triggername){
+                    console.log('触发类型:' + triggername);
+                    console.trace('filter')
                     console.log("判定区牌数量:" + player.countCards('j'));
-					if(player.countCards('j')) return false;
+					if(0 == player.countCards('j')) return false;
+                    debugger;
 					const evt=event.getl(player);
                     console.log("过滤返回:" + evt&&evt.player==player&&evt.hs&&evt.hs.length>0);
 					return evt&&evt.player==player&&evt.hs&&evt.hs.length>0;
 				},
 				async content(event,trigger,player){
+                    console.trace('content')
+                    debugger;
                     console.log('触发汲取摸牌')
 					player.draw();
 				},

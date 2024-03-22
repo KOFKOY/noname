@@ -5723,6 +5723,7 @@ export class Game extends Uninstantable {
 			}
 			else if (event.content instanceof AsyncFunction) {
 				// _status,lib,game,ui,get,ai六个变量由game.import提供
+				console.log('wsj:在这里触发content')
 				event.content(event, trigger, player).then(() => {
 					// 其实这个if几乎一定执行了
 					if (game.executingAsyncEventMap.has(event.toEvent())) {
