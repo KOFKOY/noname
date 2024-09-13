@@ -6035,6 +6035,7 @@ export class Game extends Uninstantable {
 				let card = get.card();
 				let firstCheck = false;
 				range = get.select(event.selectTarget);
+				console.log(`这里使用了selectTarget:${event.selectTarget}`);
 				let selectableTargets = false;
 				if (range[0] != range[1] || range[0] > 1) auto = false;
 				for (i = 0; i < players.length; i++) {
