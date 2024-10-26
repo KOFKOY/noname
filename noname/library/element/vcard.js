@@ -1,9 +1,7 @@
-import { AI as ai } from '../../ai/index.js';
-import { Get as get } from '../../get/index.js';
-import { Game as game } from '../../game/index.js';
-import { Library as lib } from "../index.js";
-import { status as _status } from '../../status/index.js';
-import { UI as ui } from '../../ui/index.js';
+import { get } from "../../get/index.js";
+import { lib } from "../index.js";
+import { _status } from "../../status/index.js";
+import { ai } from "../../ai/index.js";
 
 export class VCard {
 	/**
@@ -11,8 +9,9 @@ export class VCard {
 	 * @param { number | Card[] } [numberOrCards]
 	 * @param { string } [name]
 	 * @param { string } [nature]
+	 * @param { Player | false } [owner]
 	 */
-	constructor(suitOrCard, numberOrCards, name, nature) {
+	constructor(suitOrCard, numberOrCards, name, nature, owner) {
 		if (Array.isArray(suitOrCard)) {
 			/**
 			 * @type {string}
@@ -32,12 +31,12 @@ export class VCard {
 			this.nature = suitOrCard[3];
 		}
 		// @ts-ignore
-		else if (get.itemtype(suitOrCard) == 'card') {
-			this.name = get.name(suitOrCard);
-			this.suit = get.suit(suitOrCard);
-			this.color = get.color(suitOrCard);
-			this.number = get.number(suitOrCard);
-			this.nature = get.nature(suitOrCard);
+		else if (get.itemtype(suitOrCard) == "card") {
+			this.name = get.name(suitOrCard, owner);
+			this.suit = get.suit(suitOrCard, owner);
+			this.color = get.color(suitOrCard, owner);
+			this.number = get.number(suitOrCard, owner);
+			this.nature = get.nature(suitOrCard, owner);
 			/**
 			 * @type { boolean }
 			 */
@@ -53,16 +52,16 @@ export class VCard {
 			const info = get.info(this, false);
 			if (info) {
 				const autoViewAs = info.autoViewAs;
-				if (typeof autoViewAs == 'string') this.name = autoViewAs;
+				if (typeof autoViewAs == "string") this.name = autoViewAs;
 			}
-		}
-		else if (suitOrCard && typeof suitOrCard != 'string') {
-			Object.keys(suitOrCard).forEach(key => {
+		} else if (suitOrCard && typeof suitOrCard != "string") {
+			Object.keys(suitOrCard).forEach((key) => {
 				/**
 				 * @type { PropertyDescriptor }
 				 */
 				// @ts-ignore
-				const propertyDescriptor = Object.getOwnPropertyDescriptor(suitOrCard, key), value = propertyDescriptor.value;
+				const propertyDescriptor = Object.getOwnPropertyDescriptor(suitOrCard, key),
+					value = propertyDescriptor.value;
 				if (Array.isArray(value)) this[key] = value.slice();
 				else Object.defineProperty(this, key, propertyDescriptor);
 			});
@@ -73,22 +72,26 @@ export class VCard {
 				 */
 				this.cards = numberOrCards.slice();
 				if (noCards) {
-					if (!lib.suits.includes(this.suit)) this.suit = get.suit(this);
-					if (!Object.keys(lib.color).includes(this.color)) this.color = get.color(this);
-					if (typeof this.number != 'number') this.number = get.number(this);
-					if (!this.nature) this.nature = get.nature(this);
+					if (!lib.suits.includes(this.suit)) this.suit = get.suit(this, owner);
+					if (!Object.keys(lib.color).includes(this.color)) this.color = get.color(this, owner);
+					if (typeof this.number != "number") this.number = get.number(this, owner);
+					if (!this.nature) this.nature = get.nature(this, owner);
 				}
+			} else if (numberOrCards === "unsure" && !this.isCard) {
+				if (!this.suit) this.suit = "unsure";
+				if (!this.color) this.color = "unsure";
+				if (!this.number) this.number = "unsure";
 			}
 			const info = get.info(this, false);
 			if (info) {
 				const autoViewAs = info.autoViewAs;
-				if (typeof autoViewAs == 'string') this.name = autoViewAs;
+				if (typeof autoViewAs == "string") this.name = autoViewAs;
 			}
 		}
-		if (typeof suitOrCard == 'string') this.suit = suitOrCard;
-		if (typeof numberOrCards == 'number') this.number = numberOrCards;
-		if (typeof name == 'string') this.name = name;
-		if (typeof nature == 'string') this.nature = nature;
+		if (typeof suitOrCard == "string") this.suit = suitOrCard;
+		if (typeof numberOrCards == "number") this.number = numberOrCards;
+		if (typeof name == "string") this.name = name;
+		if (typeof nature == "string") this.nature = nature;
 		if (!this.storage) this.storage = {};
 		if (!this.cards) this.cards = [];
 	}
@@ -116,13 +119,37 @@ export class VCard {
 	hasNature(nature, player) {
 		const natures = get.natureList(this, player);
 		if (!nature) return natures.length > 0;
-		if (nature == 'linked') return natures.some(n => lib.linked.includes(n));
+		if (nature == "linked") return natures.some((n) => lib.linked.includes(n));
 		return get.is.sameNature(natures, nature);
 	}
-	getCacheKey(){
-		return `[vc:${this.name}+${this.suit?this.suit:'none'}+${this.number===undefined?'none':this.number}${this.nature?'+':''}${this.nature?this.nature:''}]`;
+	/**
+	 * 返回一个键值，用于在缓存中作为键名。
+	 * @param { boolean } [similar] true伪equals, false统一前缀
+	 * @returns {string} cacheKey
+	 */
+	getCacheKey(similar) {
+		let prefix = "[object:";
+		if (similar !== false) prefix = similar ? "[card:" : "[vcard:";
+		if (this.cardid) return prefix + this.cardid + "]";
+		if (!this.cards.length) return prefix + `${this.name}+${
+			this.suit ? this.suit : (this.color || "none")
+		}+${
+			this.number === undefined ? "none" : this.number
+		}${
+			this.nature ? "+" + this.nature : ""
+		}]`;
+		if (similar !== undefined && this.cards.length === 1) return ai.getCacheKey(this.cards[0], similar);
+		return prefix + "[array:[" + this.cards.map(i => {
+			return ai.getCacheKey(i, similar);
+		}).join("-") + "]]]";
 	}
 	hasGaintag(tag) {
 		return this.gaintag && this.gaintag.includes(tag);
+	}
+	initID() {
+		if (!this.vcardID){
+			this.vcardID = get.id();
+			if (lib.vcardOL) lib.vcardOL[this.vcardID] = this;
+		}
 	}
 }
